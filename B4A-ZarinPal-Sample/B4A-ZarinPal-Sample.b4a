@@ -1,0 +1,91 @@
+﻿Version=6.5
+NumberOfModules=1
+Module1=Starter
+Build1=Default,seyyedmorteza.zarinpal.samplecode
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: http://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="22"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~'End of default text.~\n~AddApplicationText(<activity android:name="ir.moslem_deris.apps.zarinpal.PaymentActivity"/>)
+IconFile=
+NumberOfFiles=0
+NumberOfLibraries=2
+Library1=core
+Library2=zarinpalpurchase
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: B4A Example
+	#VersionCode: 1
+	#VersionName: 
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: unspecified
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: True
+#End Region
+
+Sub Process_Globals
+
+End Sub
+
+Sub Globals
+	Dim PaymentBtn As Button,MerchantText,AmountText As EditText
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	'Add Views To Activity
+	MerchantText.Initialize("")
+	Activity.AddView(MerchantText,0,0,100%x,100dip)
+	MerchantText.Hint = "Enter MerchantID"
+	AmountText.Initialize("")
+	Activity.AddView(AmountText,0,100dip,100%x,100dip)
+	AmountText.Hint = "Enter Amount"
+	AmountText.InputType = AmountText.INPUT_TYPE_NUMBERS
+	PaymentBtn.Initialize("PaymentBtn")
+	Activity.AddView(PaymentBtn,30%x,200dip,40%x,100dip)
+	PaymentBtn.Text = "Payment"
+End Sub
+
+Sub Activity_Resume
+	
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub
+
+Sub PaymentBtn_Click
+	'Clicked Payment Button
+	Dim Payment As Payment
+	Payment.Initialize _ 'Initialize Payment
+		.SetMerchantID(MerchantText.Text) _ 'Set Merchent ID
+		.SetAmount(AmountText.Text) _ 'Set Payment Amount Example : 1000
+		.SetEmail("sseedd524@gmail.com") _ 'Set Email Address
+		.SetDescription("تست پرداخت کتابخونه B4A") _ 'Show In Payment Page
+		.SetMobile("09116745428") 'Set Mobile PhoneNumber
+	'Start Payment
+	ZarinPal.Pay(Payment,"Purchase")
+End Sub
+
+Sub Purchase_Failure(Error As Object)
+	'Payment Failed!
+	Dim ErrorMessage As String
+	Select Error
+		Case ZarinPal.INVALID_PAYMENT
+			ErrorMessage = "پرداخت تایید نشد"
+		Case ZarinPal.USER_CANCELED
+			ErrorMessage = "پرداخت توسط کاربر متوقف شد"
+		Case ZarinPal.NOT_ENOUGH_DATA
+			ErrorMessage = "اطلاعات پرداخت کافی نیست"
+		Case ZarinPal.UNKNOWN
+			ErrorMessage = "خطای ناشناخته"
+	End Select
+	ErrorMessage = "خطا : "&CRLF&ErrorMessage
+	ToastMessageShow(ErrorMessage,True)
+	Activity.Title = ErrorMessage
+End Sub
+
+Sub Purchase_Success(RefID As String)
+	'Payment Success
+	ToastMessageShow("Payment Success :)",True)
+	Activity.Title = "کد پیگیری : "&RefID
+End Sub
